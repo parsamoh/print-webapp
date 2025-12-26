@@ -19,15 +19,10 @@ export class CupsClient {
         return new Promise((resolve, reject) => {
             const printer = ipp.Printer(`${this.cupsUrl}/printers`);
 
+            // Simplify request to get all attributes
             const msg = {
                 'operation-attributes-tag': {
-                    'requested-attributes': [
-                        'printer-name',
-                        'printer-info',
-                        'printer-location',
-                        'printer-state',
-                        'printer-state-reasons'
-                    ]
+                    // removing requested-attributes to fetch everything
                 }
             };
 
@@ -38,6 +33,7 @@ export class CupsClient {
                     return;
                 }
 
+                console.log('CUPS Raw Response:', JSON.stringify(res, null, 2)); // Log full response
                 console.log('CUPS Connection Successful. Found printers.');
                 const printers: PrinterInfo[] = [];
 
