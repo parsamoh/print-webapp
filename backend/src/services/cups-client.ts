@@ -19,10 +19,17 @@ export class CupsClient {
         return new Promise((resolve, reject) => {
             const printer = ipp.Printer(`${this.cupsUrl}/printers`);
 
-            // Simplify request to get all attributes
+            // Standard CUPS-Get-Printers request
             const msg = {
                 'operation-attributes-tag': {
-                    // removing requested-attributes to fetch everything
+                    'requesting-user-name': 'print-web-client',
+                    'requested-attributes': [
+                        'printer-name',
+                        'printer-info',
+                        'printer-location',
+                        'printer-state',
+                        'printer-state-reasons'
+                    ]
                 }
             };
 
