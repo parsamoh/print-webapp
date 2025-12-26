@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  print-web:
+    build: .
+    image: print-web:latest
+    container_name: print-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CUPS_URL=http://host.docker.internal:631
+      - CUPS_PRINTER_NAME=your_printer_name
+    volumes:
+      # Persist uploads and temp files if needed
+      - uploads_data:/app/uploads
+      - temp_data:/app/temp
+    restart: unless-stopped
+    # Required for Linux to access host CUPS
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  uploads_data:
+  temp_data:
