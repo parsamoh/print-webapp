@@ -15,6 +15,7 @@ export class CupsClient {
      * Get list of available printers
      */
     async getPrinters(): Promise<PrinterInfo[]> {
+        console.log(`Checking CUPS connection at ${this.cupsUrl}...`);
         return new Promise((resolve, reject) => {
             const printer = ipp.Printer(`${this.cupsUrl}/printers`);
 
@@ -32,10 +33,12 @@ export class CupsClient {
 
             printer.execute('CUPS-Get-Printers', msg, (err: Error | null, res: any) => {
                 if (err) {
+                    console.error('CUPS Connection Failed:', err);
                     reject(err);
                     return;
                 }
 
+                console.log('CUPS Connection Successful. Found printers.');
                 const printers: PrinterInfo[] = [];
 
                 if (res['printer-attributes-tag']) {
@@ -44,8 +47,10 @@ export class CupsClient {
                         : [res['printer-attributes-tag']];
 
                     for (const printerAttrs of printerGroups) {
+                        const printerName = printerAttrs['printer-name'] || 'Unknown';
+                        console.log(`Found printer: ${printerName}`);
                         printers.push({
-                            name: printerAttrs['printer-name'] || 'Unknown',
+                            name: printerName,
                             description: printerAttrs['printer-info'] || '',
                             location: printerAttrs['printer-location'] || '',
                             state: this.getPrinterStateString(printerAttrs['printer-state']),
@@ -54,6 +59,8 @@ export class CupsClient {
                                 : [printerAttrs['printer-state-reasons'] || 'none']
                         });
                     }
+                } else {
+                    console.log('No printers found in CUPS response.');
                 }
 
                 resolve(printers);

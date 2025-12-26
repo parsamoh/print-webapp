@@ -279,11 +279,22 @@ setInterval(() => {
 }, 600000); // Run every 10 minutes
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`🖨️  Print Web Backend running on http://localhost:${PORT}`);
     console.log(`📁 Upload directory: ${UPLOAD_DIR}`);
     console.log(`📁 Temp directory: ${TEMP_DIR}`);
     console.log(`🖨️  CUPS URL: ${process.env.CUPS_URL || 'http://localhost:631'}`);
+
+    // Initial connection check
+    try {
+        console.log('Testing connection to CUPS server...');
+        const printers = await cupsClient.getPrinters();
+        console.log(`✅ Successfully connected to CUPS. Found ${printers.length} printers.`);
+    } catch (error) {
+        console.error('❌ Failed to connect to CUPS server on startup.');
+        console.error('   Please check your CUPS_URL in .env or docker-compose.yml');
+        console.error('   Ensure CUPS is running and accessible.');
+    }
 });
 
 export default app;
